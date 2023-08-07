@@ -6,6 +6,5 @@ jobs:
     steps:
       - name: hello
         run: echo "hello world"
-      - name: this will fail
-        run: exit 1/
+
     
