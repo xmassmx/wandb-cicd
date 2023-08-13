@@ -1,13 +1,12 @@
-name: ghapi
-on: pull_request
+name: excercise-ghapi
+on: issue_comment
 
 permissions:
-  contents: read
   issues: write
   pull-requests: write
 
 jobs:
-  ghapi:
+  ghapi-exercise:
     if: (github.event.issue.pull_request != null) && contains(github.event.comment.body, '/bug')
     runs-on: ubuntu-latest
     steps:        
@@ -26,8 +25,8 @@ jobs:
         from ghapi.core import GhApi
         owner,repo = os.environ['REPO'].split('/')
         api = GhApi(owner=owner, repo=repo)
-        api.issues.add_labels(issue_number=os.environ['NUMBER'], labels = ['bug'])
+        api.issues.add_labels(issue_number=os.environ['NUMBER'], labels=['bug'])
       env:
-        NUMBER: ${{ github.event.number }} 
+        NUMBER: ${{ github.event.issue.number }} 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         REPO: ${{ github.repository }}
