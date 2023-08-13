@@ -26,7 +26,7 @@ jobs:
         from ghapi.core import GhApi
         owner,repo = os.environ['REPO'].split('/')
         api = GhApi(owner=owner, repo=repo)
-        api.issues.add_labels(${NUMBER}, labels = ['bug'])
+        api.issues.add_labels(issue_number=os.environ['NUMBER'], labels = ['bug'])
       env:
         NUMBER: ${{ github.event.number }} 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
