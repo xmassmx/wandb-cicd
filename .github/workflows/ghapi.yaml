@@ -1,5 +1,5 @@
 name: ghapi
-on: pull_request
+on: issue_comment
 
 permissions:
   contents: read
