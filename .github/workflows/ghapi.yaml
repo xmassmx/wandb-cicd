@@ -1,5 +1,5 @@
 name: ghapi
-on: pull_request
+on: issue_comment
 
 permissions:
   contents: read
@@ -14,7 +14,7 @@ jobs:
     - name: install dependencies
       run: pip install ghapi 
 
-    - name: see payload # this step is for debugging purposes only, so you can see the payload. 
+    - name: see payload # this step is for debugging purposes only, so you can see the payload.
       run: echo "PAYLOAD:\n${PAYLOAD}\n"
       env:
         PAYLOAD: ${{ toJSON(github.event) }}
