@@ -24,9 +24,11 @@ jobs:
         import os
         from ghapi.core import GhApi
         owner,repo = os.environ['REPO'].split('/')
+        run_id = os.environ['COMMENT'].split( )[1]
         api = GhApi(owner=owner, repo=repo)
-        api.issues.add_labels(issue_number=os.environ['NUMBER'], labels=['bug'])
+        print(run_id)
       env:
         NUMBER: ${{ github.event.issue.number }} 
+        COMMENT: ${{ github.event.comment.body }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         REPO: ${{ github.repository }}
