@@ -78,7 +78,7 @@ jobs:
         from ghapi.core import GhApi
         owner,repo = os.environ['REPO'].split('/')
         api = GhApi(owner=owner, repo=repo)
-        report_url = ${{ steps.report-gen.outputs.URL }}
+        report_url = f'${{ steps.report-gen.outputs.URL }}'
         if report_url == 'same':
           api.issues.create_comment(issue_number=os.environ['NUMBER'], body = f" The run ID entered is for the baseline model")
         else:
