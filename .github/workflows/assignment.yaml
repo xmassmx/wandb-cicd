@@ -41,7 +41,7 @@ jobs:
                                  {"tags": {"$in": tags}}) 
           print(baseline_runs[0].id)
           print(f"'${{ steps.set-id.outputs.RUN_ID }}'")
-          if ${{ steps.set-id.outputs.RUN_ID }} == baseline_runs[0].id:
+          if f'{${{ steps.set-id.outputs.RUN_ID }}}' == baseline_runs[0].id:
             with open(os.environ['GITHUB_OUTPUT'], 'a') as f: 
               print(f'URL=same', file=f)
           else:
