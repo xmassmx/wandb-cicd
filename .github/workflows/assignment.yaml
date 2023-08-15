@@ -67,14 +67,14 @@ jobs:
 
 
 
-    - name: Make a comment
+    - name: 3. Comment on PR
       shell: python
       run: |
         import os
         from ghapi.core import GhApi
         owner,repo = os.environ['REPO'].split('/')
         api = GhApi(owner=owner, repo=repo)
-        api.issues.add_comment(issue_number=os.environ['NUMBER'], body = f" The report can be found here '${{ steps.report-gen.outputs.URL }}'")
+        api.issues.create_comment(issue_number=os.environ['NUMBER'], body = f" The report can be found here '${{ steps.report-gen.outputs.URL }}'")
       env:
         NUMBER: ${{ github.event.issue.number }} 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
