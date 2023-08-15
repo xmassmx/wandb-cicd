@@ -13,28 +13,64 @@ jobs:
     - name: install dependencies
       run: pip install ghapi wandb
 
-    - name: see payload # this step is for debugging purposes only, so you can see the payload. 
-      run: echo "PAYLOAD:\n${PAYLOAD}\n"
-      env:
-        PAYLOAD: ${{ toJSON(github.event) }}
+    # - name: see payload # this step is for debugging purposes only, so you can see the payload. 
+    #   run: echo "PAYLOAD:\n${PAYLOAD}\n"
+    #   env:
+    #     PAYLOAD: ${{ toJSON(github.event) }}
       
-    - name: parse run-ID
+    - name: 1. Parsing RUN-ID
       id: set-id
       shell: python
       run: |
         import os
-        from ghapi.core import GhApi
-        owner,repo = os.environ['REPO'].split('/')
         run_id = os.environ['COMMENT'].split( )[1]
         if run_id:
           with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
               print(f'RUN_ID={run_id}', file=f)
              
         
-      env:
-        NUMBER: ${{ github.event.issue.number }} 
+      env: 
         COMMENT: ${{ github.event.comment.body }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        REPO: ${{ github.repository }}
+        
+        
     - name: print value 
       run: echo "the value is ${{ steps.set-id.outputs.RUN_ID }}"
+      
+    - name: 2. Report Generation  
+      id: report-gen
+      shell: python
+      run: |
+          import wandb
+          import wandb.apis.reports as wr
+          PROJECT = 'cicd-quickstart'
+          ENTITY = 'massm'
+          api = wandb.Api()
+          tags= ['baseline']
+          
+          baseline_runs=api.runs(f'{ENTITY}/{PROJECT}', 
+                                 {"tags": {"$in": tags}}) # this is the Mongo Clie
+          
+          report = wr.Report(
+              entity=ENTITY,
+              project=PROJECT,
+              title='Compare Runs',
+              description="A demo of comparing runs programatically"
+          )  
+          pg = wr.PanelGrid(
+            runsets=[
+                wr.Runset(ENTITY, PROJECT, "Run Comparison").set_filters_with_python_expr("Name in [steps.set-id.outputs.RUN_ID, baseline_runs[0].id]")
+            ],
+            panels=[
+                wr.RunComparer(diff_only='split', layout={'w': 24, 'h': 15}),
+            ]
+          )
+          report.blocks = report.blocks[:1] + [pg] + report.blocks[1:]
+          report.save()
+          print(report.url)
+        
+          if os.getenv('CI'): # is set to `true` in GitHub Actions https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as f: # write the output variable REPORT_URL to the GITHUB_OUTPUT file
+                  print(f'REPORT_URL={report.url}', file=f)
+
+      env:
+        WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
