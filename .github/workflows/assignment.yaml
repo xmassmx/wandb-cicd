@@ -19,16 +19,21 @@ jobs:
         PAYLOAD: ${{ toJSON(github.event) }}
       
     - name: parse run-ID
+      id: set-id
       shell: python
       run: |
         import os
         from ghapi.core import GhApi
         owner,repo = os.environ['REPO'].split('/')
         run_id = os.environ['COMMENT'].split( )[1]
-        api = GhApi(owner=owner, repo=repo)
-        print(run_id)
+        if run_id:
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              print(f'RUN_ID=run_id', file=f)
+        
       env:
         NUMBER: ${{ github.event.issue.number }} 
         COMMENT: ${{ github.event.comment.body }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         REPO: ${{ github.repository }}
+    - name: print value 
+      run: echo "the value is ${{ steps.set-id.outputs.RUN_ID }}"
