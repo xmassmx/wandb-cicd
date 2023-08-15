@@ -42,6 +42,7 @@ jobs:
       shell: python
       run: |
           import wandb
+          import os
           import wandb.apis.reports as wr
           PROJECT = 'cicd-quickstart'
           ENTITY = 'massm'
@@ -49,7 +50,7 @@ jobs:
           tags= ['baseline']
           
           baseline_runs=api.runs(f'{ENTITY}/{PROJECT}', 
-                                 {"tags": {"$in": tags}}) # this is the Mongo Clie
+                                 {"tags": {"$in": tags}}) 
           
           report = wr.Report(
               entity=ENTITY,
