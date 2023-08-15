@@ -28,7 +28,8 @@ jobs:
         run_id = os.environ['COMMENT'].split( )[1]
         if run_id:
           with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-              print(f'RUN_ID=run_id', file=f)
+              print(f'RUN_ID={run_id}', file=f)
+             
         
       env:
         NUMBER: ${{ github.event.issue.number }} 
